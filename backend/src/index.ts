@@ -20,6 +20,11 @@ import {
   webSearchTool,
 } from "tools.js";
 import { z } from "zod";
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+const modelName = process.env.MODEL_NAME || 'gpt-4o';
 
 const GraphAnnotation = Annotation.Root({
   ...MessagesAnnotation.spec,
@@ -27,7 +32,7 @@ const GraphAnnotation = Annotation.Root({
 });
 
 const llm = new ChatOpenAI({
-  model: "gpt-4o",
+  model: modelName,
   temperature: 0,
 });
 
