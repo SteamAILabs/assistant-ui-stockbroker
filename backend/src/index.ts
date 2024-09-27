@@ -25,6 +25,7 @@ import dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 const modelName = process.env.MODEL_NAME || 'gpt-4o';
+const baseURL = process.env.baseURL || 'https://api.openai.com/v1'
 
 const GraphAnnotation = Annotation.Root({
   ...MessagesAnnotation.spec,
@@ -34,6 +35,9 @@ const GraphAnnotation = Annotation.Root({
 const llm = new ChatOpenAI({
   model: modelName,
   temperature: 0,
+  configuration: {
+    baseURL: baseURL,
+  },
 });
 
 const toolNode = new ToolNode(ALL_TOOLS_LIST);
