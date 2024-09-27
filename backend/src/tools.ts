@@ -276,7 +276,7 @@ const purchaseStockTool = tool(
 );
 
 export const webSearchTool = new TavilySearchResults({
-  maxResults: 2,
+  maxResults: 20,
 });
 
 export const ALL_TOOLS_LIST = [
