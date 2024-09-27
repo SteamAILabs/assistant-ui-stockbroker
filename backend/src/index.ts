@@ -35,9 +35,7 @@ const GraphAnnotation = Annotation.Root({
 const llm = new ChatOpenAI({
   model: modelName,
   temperature: 0,
-  configuration: {
-    baseURL: baseURL,
-  },
+  baseUrl: baseURL,
 });
 
 const toolNode = new ToolNode(ALL_TOOLS_LIST);
