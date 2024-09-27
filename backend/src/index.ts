@@ -1,5 +1,5 @@
 import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { ChatAnthropicMessages } from "@langchain/anthropic";
+import { ChatAnthropicMessages, ChatAnthropic } from "@langchain/anthropic";
 import {
   Annotation,
   END,
