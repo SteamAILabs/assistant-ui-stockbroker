@@ -1,5 +1,4 @@
 import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { ChatAnthropicMessages, ChatAnthropic } from "@langchain/anthropic";
 import {
   Annotation,
   END,
@@ -33,8 +32,7 @@ const GraphAnnotation = Annotation.Root({
   requestedStockPurchaseDetails: Annotation<StockPurchase>,
 });
   
-const llm = new ChatAnthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const llm = new ChatOpenAI({
   model: modelName,
 });
 
