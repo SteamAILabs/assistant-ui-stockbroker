@@ -7,6 +7,8 @@ import {
   CompanyFactsResponse,
   SnapshotResponse,
 } from "types.js";
+
+import {coinPriceQueryTool,  purchaseCoinTool} from "./coingecko_tools.js";
 import { z } from "zod";
 
 export async function callFinancialDatasetAPI<
@@ -199,6 +201,7 @@ export const priceSnapshotTool = tool(
           ticker: input.ticker,
         },
       });
+      // return JSON.stringify(data, null);
       return JSON.stringify(data, null);
     } catch (e: any) {
       console.warn("Error fetching price snapshots", e.message);
@@ -276,7 +279,7 @@ const purchaseStockTool = tool(
 );
 
 export const webSearchTool = new TavilySearchResults({
-  maxResults: 20,
+  maxResults: 2,
 });
 
 export const ALL_TOOLS_LIST = [
@@ -287,6 +290,8 @@ export const ALL_TOOLS_LIST = [
   priceSnapshotTool,
   purchaseStockTool,
   webSearchTool,
+  coinPriceQueryTool,
+  purchaseCoinTool,
 ];
 
 export const SIMPLE_TOOLS_LIST = [
