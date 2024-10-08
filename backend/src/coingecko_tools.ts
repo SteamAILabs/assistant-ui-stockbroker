@@ -54,17 +54,24 @@ export async function callCoinGeckoAPI<
 export const coinPriceQueryTool =  tool(
   async (input) => {
     let _notSupportedSymbols : string[] = []
+    let supportedSymbols : string[] = []
     input.symbols.split(",").forEach(symbol=>{
       symbol = symbol.trim().toLowerCase()
       if (!(symbol in supportedCryptos)){
         _notSupportedSymbols.push(symbol)
+      }else{
+        const coin_id  = supportedCryptos[symbol]["id"]
+        supportedSymbols.push(coin_id)
       }
     })
+    if (supportedSymbols.length  == 0) {
+      return JSON.stringify({"unsupported_coins" : `${supportedSymbols.join(",")}`})
+    }
     try {
       const data = await callCoinGeckoAPI<Record<string, any>>({
         endpoint: "/api/v3/simple/price",
         params: {
-          ids: input.symbols,
+          ids: `${supportedSymbols.join(",")}`,
           vs_currencies: input.vs_currencies,
           include_market_cap:  input.include_market_cap,
           include_24hr_change:  input.include_24hr_change,
@@ -79,6 +86,7 @@ export const coinPriceQueryTool =  tool(
         if (typeof coinData !== 'string') {
           // Assign the vs_currencies value
           coinData.vs_currencies = input.vs_currencies;
+          coinData.symbol  = supportedCryptos[coinId]["name"]
         }
       }
       if (_notSupportedSymbols.length>0) {
