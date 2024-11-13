@@ -9,6 +9,7 @@ import {
 } from "types.js";
 
 import {coinPriceQueryTool,  purchaseCoinTool} from "./coingecko_tools.js";
+import {historicalChainTvlQueryTool} from './defillama.js';
 import { z } from "zod";
 
 export async function callFinancialDatasetAPI<
@@ -292,6 +293,7 @@ export const ALL_TOOLS_LIST = [
   webSearchTool,
   coinPriceQueryTool,
   purchaseCoinTool,
+  historicalChainTvlQueryTool,
 ];
 
 export const SIMPLE_TOOLS_LIST = [

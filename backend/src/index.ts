@@ -28,7 +28,8 @@ import dotenv from "dotenv";
 
 // Load environment variables from .env file
 dotenv.config();
-const modelName = process.env.MODEL_NAME || "gpt-4o-mini";
+
+
 const GraphAnnotation = Annotation.Root({
   ...MessagesAnnotation.spec,
   requestedStockPurchaseDetails: Annotation<StockPurchase>,
@@ -36,10 +37,11 @@ const GraphAnnotation = Annotation.Root({
 });
 
 const llm = new ChatOpenAI({
-  model: modelName,
+  model: process.env.MODEL_NAME || "gpt-4o-mini",
   temperature: 0,
 });
 
+const llmWithTools = llm.bindTools(ALL_TOOLS_LIST);
 const toolNode = new ToolNode(ALL_TOOLS_LIST);
 
 const callModel = async (state: typeof GraphAnnotation.State) => {
@@ -59,8 +61,7 @@ const callModel = async (state: typeof GraphAnnotation.State) => {
       "Technical Strength: You utilize large language models like GPT and self-developed agents, enhanced by Retrieval-Augmented Generation (RAG) for real-time information retrieval and reducing hallucinations. " +
       "Future Plans: AI Steam Search's upcoming features include an advanced Solana asset trading version, providing users with enhanced search and trading capabilities."
   };
-
-  const llmWithTools = llm.bindTools(ALL_TOOLS_LIST);
+  
   const result = await llmWithTools.invoke([systemMessage, ...messages]);
   return { messages: result };
 };
@@ -131,18 +132,19 @@ const preparePurchaseDetails = async (state: typeof GraphAnnotation.State) => {
     throw new Error("Expected the last message to be an AI message");
   }
 
-  let purchase_tool 
   // Cast here since `tool_calls` does not exist on `BaseMessage`
   const messageCastAI = lastMessage as AIMessage;
   const purchaseStockTool = messageCastAI.tool_calls?.find(
     (tc) => tc.name === "purchase_stock" || tc.name === "purchase_coin"
   );
+
   if (!purchaseStockTool) {
     throw new Error(
       "Expected the last AI message to have a purchase_stock tool call"
     );
   }
-  if (purchaseStockTool.name ==="purchase_stock"){
+
+  if (purchaseStockTool.name === "purchase_stock") {
     let { maxPurchasePrice, companyName, ticker } = purchaseStockTool.args;
 
     if (!ticker) {
@@ -158,7 +160,7 @@ const preparePurchaseDetails = async (state: typeof GraphAnnotation.State) => {
             id: tc.id,
           };
         });
-  
+
         return {
           messages: [
             ...(toolMessages ?? []),
@@ -175,13 +177,13 @@ const preparePurchaseDetails = async (state: typeof GraphAnnotation.State) => {
         ticker = await findCompanyName(purchaseStockTool.args.companyName);
       }
     }
-  
+
     if (!maxPurchasePrice) {
       // If `maxPurchasePrice` is not defined, default to the current price.
-      const priceSnapshot = await priceSnapshotTool.invoke({ ticker }); 
+      const priceSnapshot = await priceSnapshotTool.invoke({ ticker });
       if (priceSnapshot === null) {
         maxPurchasePrice = 0;
-      }else{
+      } else {
         maxPurchasePrice = JSON.parse(priceSnapshot).snapshot.price;
       }
     }
@@ -192,20 +194,20 @@ const preparePurchaseDetails = async (state: typeof GraphAnnotation.State) => {
         maxPurchasePrice,
       },
     };
-  }else if (purchaseStockTool.name ==="purchase_coin"){
+  } else if (purchaseStockTool.name === "purchase_coin") {
     let { symbol, coinName, quantity, maxPurchasePrice } = purchaseStockTool.args;
-    
+
     if (!maxPurchasePrice) {
-      const priceinfoString = await coinPriceQueryTool.invoke({symbols: symbol})
-      if (priceinfoString!== null){
-        const priceinfo = await JSON.parse(priceinfoString);
+      const priceinfoString = await coinPriceQueryTool.invoke({ symbols: symbol });
+      if (priceinfoString !== null) {
+        const priceinfo = JSON.parse(priceinfoString);
         const currencyPrefix = priceinfo.vs_currencies;
-        maxPurchasePrice = priceinfo[currencyPrefix]; 
-      }      
+        maxPurchasePrice = priceinfo[currencyPrefix];
+      }
     }
-    
-    if (symbol in supportedCryptos){
-      coinName = supportedCryptos[symbol]["name"]
+
+    if (symbol in supportedCryptos) {
+      coinName = supportedCryptos[symbol]["name"];
     }
     return {
       requestedCoinPurchaseDetails: {
@@ -214,9 +216,18 @@ const preparePurchaseDetails = async (state: typeof GraphAnnotation.State) => {
         quantity: quantity ?? 1, // Default to one if not provided.
         maxPurchasePrice,
       },
-    }
+    };
   }
 
+  // Add a default return statement to handle any unexpected paths
+  return {
+    messages: [
+      {
+        role: "assistant",
+        content: "Unable to prepare purchase details. Please check your input.",
+      },
+    ],
+  };
 };
 
 const purchaseApproval = async (state: typeof GraphAnnotation.State) => {
@@ -312,6 +323,29 @@ const workflow = new StateGraph(GraphAnnotation)
   ]);
 
 export const graph = workflow.compile({
-  // checkpointer: new MemorySaver(),
+  checkpointer: new MemorySaver(),
+  // store: new InMemoryStore()
   // interruptBefore: ["purchase_approval"]
 });
+
+
+
+// let config = { configurable: { thread_id: "1", userId: "1" } };
+// let inputMessage = { type: "user", content: "what's the tvl of defi?" };
+
+// const callGraphSync = async () => {
+//   try {
+//     const stream = await graph.stream(
+//       { messages: [inputMessage] },
+//       { ...config, streamMode: ["messages", "custom"] }
+//     );
+
+//     for await (const chunk of stream) {
+//       console.log(chunk);
+//     }
+//   } catch (error) {
+//     console.error("Error processing stream:", error);
+//   }
+// }
+
+// callGraphSync();

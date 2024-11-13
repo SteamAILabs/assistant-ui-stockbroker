@@ -5,24 +5,37 @@
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.json --outDir dist",
-    "start": "tsx --experimental-wasm-modules -r dotenv/config src/index.ts",
+    "dev_with_local_server": "tsx --experimental-wasm-modules -r dotenv/config src/server.ts",
+    "dev_test.ts": "tsx --experimental-wasm-modules -r dotenv/config src/test.ts",
+    "dev_graph": "tsx --experimental-wasm-modules -r dotenv/config src/index.ts",
     "format": "prettier --write \"**/*.ts\"",
-    "format:check": "prettier --check \"**/*.ts\""
+    "format:check": "prettier --check \"**/*.ts\"",
+    "test": "jest"
   },
   "author": "Brace Sproul",
   "license": "MIT",
   "dependencies": {
-    "@langchain/community": "^0.2.31",
-    "@langchain/core": "^0.2.31",
+    "@langchain/community": "^0.3.14",
+    "@langchain/core": "^0.3.17",
     "@langchain/langgraph": "^0.2.1",
-    "@langchain/openai": "^0.2.8",
+    "@langchain/openai": "^0.3.11",
+    "express": "^4.21.0",
+    "node-fetch": "^2.7.0",
+    "uuid": "^9.0.0",
+    "vis-timeline": "^7.7.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@tsconfig/recommended": "^1.0.2",
+    "@tsconfig/recommended": "^1.0.7",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.7.4",
+    "@types/uuid": "^10.0.0",
     "dotenv": "^16.0.3",
     "prettier": "^2.8.3",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.6.3"
   }
 }

@@ -7,8 +7,8 @@
       "ES2022.Object",
       "DOM"
     ],
-    "target": "ES2021",
-    "module": "nodenext",
+    "target": "ES2015",
+    "module": "commonjs",
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./src",
@@ -17,7 +17,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true,
     "useDefineForClassFields": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": [
     "node_modules/",
@@ -25,6 +29,6 @@
     "tests/"
   ],
   "include": [
-    "./src"
+    "./src/**/*.ts"
   ]
 }
